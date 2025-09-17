@@ -14,11 +14,11 @@ const InteractiveMap = dynamic(() => import("@/components/map/interactive-map"),
 
 // Mock data for farm plots
 const farmPlots = [
-  { id: 1, name: "Plot A", herb: "Basil", area: "2.5 acres", soilType: "Loamy", plantDate: "2024-01-15" },
-  { id: 2, name: "Plot B", herb: "Rosemary", area: "1.8 acres", soilType: "Sandy", plantDate: "2024-02-01" },
-  { id: 3, name: "Plot C", herb: "Thyme", area: "3.2 acres", soilType: "Clay", plantDate: "2024-01-20" },
-  { id: 4, name: "Plot D", herb: "Oregano", area: "2.1 acres", soilType: "Loamy", plantDate: "2024-02-10" },
-  { id: 5, name: "Plot E", herb: "Mint", area: "1.5 acres", soilType: "Sandy", plantDate: "2024-01-25" },
+  { id: 1, name: "Lô A", herb: "Basil", area: "2.5 acres", soilType: "Loamy", plantDate: "2024-01-15" },
+  { id: 2, name: "Lô B", herb: "Rosemary", area: "1.8 acres", soilType: "Sandy", plantDate: "2024-02-01" },
+  { id: 3, name: "Lô C", herb: "Thyme", area: "3.2 acres", soilType: "Clay", plantDate: "2024-01-20" },
+  { id: 4, name: "Lô D", herb: "Oregano", area: "2.1 acres", soilType: "Loamy", plantDate: "2024-02-10" },
+  { id: 5, name: "Lô E", herb: "Mint", area: "1.5 acres", soilType: "Sandy", plantDate: "2024-01-25" },
 ]
 
 // Mock sensor data
