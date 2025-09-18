@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Droplets, Activity, Plus, Edit, Trash2, UploadCloud, FileText, Dna } from "lucide-react"
+import { MapPin, Droplets, Activity, Plus, Edit, Trash2, UploadCloud, FileText, Dna, Calendar as CalendarIcon, Camera } from "lucide-react"
 import dynamic from "next/dynamic"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
 
 // Dynamic import to ensure Leaflet only loads on client
 const InteractiveMap = dynamic(() => import("@/components/map/interactive-map"), { ssr: false })
@@ -68,6 +75,20 @@ const ownership = {
 export default function FarmPlotsPage() {
   const [selectedPlot, setSelectedPlot] = useState(farmPlots[0])
 
+  // Local state for new tabs
+  const [sowingDate, setSowingDate] = useState<Date | undefined>(undefined)
+  const [harvestDate, setHarvestDate] = useState<Date | undefined>(undefined)
+  const [inputsRows, setInputsRows] = useState<Array<{ id: number; type?: string; qty?: string; fileName?: string }>>([
+    { id: 1, type: undefined, qty: "", fileName: undefined },
+  ])
+
+  const addInputRow = () => {
+    setInputsRows((rows) => [...rows, { id: Date.now(), type: undefined, qty: "", fileName: undefined }])
+  }
+  const removeInputRow = (id: number) => {
+    setInputsRows((rows) => rows.filter((r) => r.id !== id))
+  }
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto">
@@ -120,12 +141,15 @@ export default function FarmPlotsPage() {
               </CardHeader>
               <CardContent className="flex-1">
                 <Tabs defaultValue="overview" className="h-full">
-                  <TabsList className="grid w-full grid-cols-5 mb-6">
+                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
                     <TabsTrigger value="overview">Tổng quan</TabsTrigger>
                     <TabsTrigger value="sensors">Cảm biến</TabsTrigger>
                     <TabsTrigger value="activity">Lịch sử hoạt động</TabsTrigger>
                     <TabsTrigger value="certs">Chứng nhận</TabsTrigger>
                     <TabsTrigger value="dna-land">DNA & Đất</TabsTrigger>
+                    <TabsTrigger value="land-seed-inputs">Đất, giống & đầu vào</TabsTrigger>
+                    <TabsTrigger value="harvest-post">Thu hoạch & sau thu hoạch</TabsTrigger>
+                    <TabsTrigger value="testing-compliance">Kiểm nghiệm & tuân thủ</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="space-y-6">
@@ -174,6 +198,253 @@ export default function FarmPlotsPage() {
                             <p className="text-sm text-muted-foreground">Ngày trồng</p>
                             <p className="font-semibold text-white">{selectedPlot.plantDate}</p>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  {/* Land, Seed & Inputs Tab */}
+                  <TabsContent value="land-seed-inputs" className="space-y-6">
+                    {/* Land & Water Profile */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <div className="mb-2">
+                        <h3 className="font-semibold">Hồ sơ đất & nguồn nước</h3>
+                        <p className="text-sm text-muted-foreground">Cập nhật lịch sử sử dụng đất, kết quả kiểm tra đất & nước, và nguồn nước tưới.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="land-history">Lịch sử sử dụng đất 5 năm (tệp)</Label>
+                          <Input id="land-history" type="file" accept=".pdf,.doc,.docx,.xlsx,.xls,.csv,.jpg,.png" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soil-water-test">Kết quả kiểm tra đất & nước (PDF)</Label>
+                          <Input id="soil-water-test" type="file" accept=".pdf" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Nguồn nước tưới</Label>
+                          <Select>
+                            <SelectTrigger className="w-full"><SelectValue placeholder="Chọn nguồn nước" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="well">Giếng khoan</SelectItem>
+                              <SelectItem value="river">Sông/suối</SelectItem>
+                              <SelectItem value="rain">Nước mưa</SelectItem>
+                              <SelectItem value="municipal">Nước máy</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Biện pháp bảo vệ môi trường</Label>
+                          <Select>
+                            <SelectTrigger className="w-full"><SelectValue placeholder="Chọn biện pháp" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="buffer">Vành đai cây xanh</SelectItem>
+                              <SelectItem value="erosion">Kiểm soát xói mòn</SelectItem>
+                              <SelectItem value="waste">Quản lý chất thải</SelectItem>
+                              <SelectItem value="ipm">IPM - Quản lý dịch hại tổng hợp</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Seed & Cultivar Profile */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <div className="mb-2">
+                        <h3 className="font-semibold">Hồ sơ giống & dòng</h3>
+                        <p className="text-sm text-muted-foreground">Thông tin nguồn giống, chứng từ và ngày gieo/trồng.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="seed-cultivar">Giống/Dòng sử dụng</Label>
+                          <Input id="seed-cultivar" placeholder="VD: Ocimum basilicum var. thyrsiflora" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="seed-source">Chứng từ nguồn giống (Hóa đơn/Chứng nhận)</Label>
+                          <Input id="seed-source" type="file" accept=".pdf,.jpg,.png" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>GMO sử dụng?</Label>
+                          <RadioGroup defaultValue="no" className="flex gap-6">
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem id="gmo-no" value="no" />
+                              <Label htmlFor="gmo-no">Không</Label>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem id="gmo-yes" value="yes" />
+                              <Label htmlFor="gmo-yes">Có</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Ngày gieo/trồng</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="w-full justify-start">
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {sowingDate ? format(sowingDate, "yyyy-MM-dd") : "Chọn ngày"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={sowingDate}
+                                onSelect={setSowingDate}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Inputs Management */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold">Quản lý đầu vào</h3>
+                        <Button size="sm" onClick={addInputRow}><Plus className="w-4 h-4 mr-2" />Thêm dòng</Button>
+                      </div>
+                      <div className="rounded-lg border border-white/10 overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-white/10">
+                              <TableHead className="text-white">Loại đầu vào</TableHead>
+                              <TableHead className="text-white">Số lượng</TableHead>
+                              <TableHead className="text-white">Chứng nhận/Nhãn (ảnh)</TableHead>
+                              <TableHead className="text-white text-right">Hành động</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {inputsRows.map((row) => (
+                              <TableRow key={row.id} className="border-white/10">
+                                <TableCell>
+                                  <Select onValueChange={(v) => setInputsRows((rs) => rs.map(r => r.id === row.id ? { ...r, type: v } : r))}>
+                                    <SelectTrigger className="w-[180px]"><SelectValue placeholder="Chọn" /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="fertilizer">Phân bón</SelectItem>
+                                      <SelectItem value="pesticide">Thuốc BVTV</SelectItem>
+                                      <SelectItem value="compost">Phân hữu cơ</SelectItem>
+                                      <SelectItem value="amendment">Cải tạo đất</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </TableCell>
+                                <TableCell>
+                                  <Input value={row.qty} onChange={(e) => setInputsRows((rs) => rs.map(r => r.id === row.id ? { ...r, qty: e.target.value } : r))} placeholder="VD: 10 kg" />
+                                </TableCell>
+                                <TableCell>
+                                  <Input type="file" accept=".jpg,.png,.webp" onChange={(e) => {
+                                    const f = e.target.files?.[0]
+                                    setInputsRows((rs) => rs.map(r => r.id === row.id ? { ...r, fileName: f?.name } : r))
+                                  }} />
+                                  {row.fileName ? (
+                                    <p className="text-xs text-muted-foreground mt-1">Đã chọn: {row.fileName}</p>
+                                  ) : null}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button size="sm" variant="ghost" onClick={() => removeInputRow(row.id)} className="h-8">Xóa</Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  {/* Harvest & Post-Harvest Tab */}
+                  <TabsContent value="harvest-post" className="space-y-6">
+                    {/* Harvesting */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <div className="mb-2">
+                        <h3 className="font-semibold">Thu hoạch</h3>
+                        <p className="text-sm text-muted-foreground">Ghi lại ngày thu hoạch, sản lượng và phương pháp thu hoạch.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Ngày thu hoạch</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="w-full justify-start">
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {harvestDate ? format(harvestDate, "yyyy-MM-dd") : "Chọn ngày"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar mode="single" selected={harvestDate} onSelect={setHarvestDate} initialFocus />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="yield-kg">Sản lượng (kg)</Label>
+                          <Input id="yield-kg" type="number" placeholder="VD: 250" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Phương pháp thu hoạch</Label>
+                          <Select>
+                            <SelectTrigger className="w-full"><SelectValue placeholder="Chọn phương pháp" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="manual">Thủ công</SelectItem>
+                              <SelectItem value="mechanical">Cơ giới</SelectItem>
+                              <SelectItem value="mixed">Kết hợp</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <Label>AI Auto-capture ảnh thu hoạch</Label>
+                        <div className="mt-2 border border-dashed border-white/20 rounded-lg p-6 flex items-center justify-between gap-4 bg-white/5">
+                          <p className="text-sm text-muted-foreground">Tính năng AI tự chụp và gắn thẻ ảnh thu hoạch (đang phát triển).</p>
+                          <Button variant="outline" className="whitespace-nowrap"><Camera className="w-4 h-4 mr-2" />Kích hoạt</Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Post-Harvest */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <div className="mb-2">
+                        <h3 className="font-semibold">Sau thu hoạch</h3>
+                        <p className="text-sm text-muted-foreground">Phương pháp sơ chế/chế biến, điều kiện lưu trữ và hồ sơ lưu mẫu.</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Phương pháp chế biến</Label>
+                          <Select>
+                            <SelectTrigger className="w-full"><SelectValue placeholder="Chọn phương pháp" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="sun-dry">Phơi nắng</SelectItem>
+                              <SelectItem value="shade-dry">Phơi râm</SelectItem>
+                              <SelectItem value="oven-dry">Sấy nhiệt</SelectItem>
+                              <SelectItem value="freeze-dry">Sấy thăng hoa</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="storage-conditions">Điều kiện lưu trữ (Nhiệt độ, Ẩm độ)</Label>
+                          <Input id="storage-conditions" placeholder="VD: 15°C, 55% RH" />
+                        </div>
+                        <div className="space-y-2 md:col-span-3">
+                          <Label htmlFor="sample-retention">Hồ sơ lưu mẫu (tệp)</Label>
+                          <Input id="sample-retention" type="file" accept=".pdf,.jpg,.png" />
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  {/* Testing & Compliance Tab */}
+                  <TabsContent value="testing-compliance" className="space-y-6">
+                    <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
+                      <h3 className="font-semibold">Kiểm nghiệm & tuân thủ</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="final-test">Kết quả kiểm nghiệm cuối (PDF)</Label>
+                          <Input id="final-test" type="file" accept=".pdf" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="inspection-reports">Biên bản thanh tra (PDF)</Label>
+                          <Input id="inspection-reports" type="file" accept=".pdf" />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="quality-standard">Chứng chỉ tiêu chuẩn chất lượng (PDF)</Label>
+                          <Input id="quality-standard" type="file" accept=".pdf" />
                         </div>
                       </div>
                     </div>

@@ -56,11 +56,11 @@ export function InteractiveMap({ height = "16rem", className = "" }: Interactive
       role="region"
     >
       <MapContainer
-        center={plotCenter}
-        zoom={15}
-        scrollWheelZoom={false}
-        style={{ height: "100%", width: "100%" }}
-        className="leaflet-map"
+  center={plotCenter}
+  zoom={15}
+  scrollWheelZoom={true}
+  style={{ height: "100%", width: "100%" }}
+  className="leaflet-map"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

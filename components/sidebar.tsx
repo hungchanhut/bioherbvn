@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Home, Leaf, Activity, Scissors as Sensors, Settings, Menu, X } from "lucide-react"
+import { Home, Leaf, Activity, Scissors as Sensors, Menu, X, Users, Box, Landmark, Clipboard, Plug, Wheat, Boxes, BadgeCheck, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -10,15 +10,22 @@ import { usePathname } from "next/navigation"
 const navigation = [
   { name: "Bảng điều khiển", href: "/dashboard", icon: Home },
   { name: "Vườn trồng", href: "/farm-plots", icon: Leaf },
+  { name: "Thu hoạch & sau thu hoạch", href: "/harvest-post-harvest", icon: Wheat },
+  { name: "Đóng gói, logistics & bán hàng", href: "/packaging-logistics-sales", icon: Boxes },
   { name: "Giám sát cảm biến", href: "/sensor-monitoring", icon: Sensors },
   { name: "Nhật ký hoạt động", href: "/activity-logs", icon: Activity },
-  { name: "Cài đặt", href: "/settings", icon: Settings },
+  { name: "Thị trường & bán hàng", href: "/market-sales", icon: Landmark },
+  { name: "Sản phẩm & đóng gói", href: "/product-packaging", icon: Box },
+  { name: "Trung tâm chứng nhận", href: "/certifications-hub", icon: BadgeCheck },
+  { name: "Lịch sử kiểm tra", href: "/inspection-history", icon: History },
+  { name: "Quản lý nhân sự", href: "/personnel-management", icon: Users },
+  { name: "Tích hợp", href: "/integrations", icon: Plug },
+  { name: "Báo cáo & chứng nhận", href: "/reports-certifications", icon: Clipboard },
 ]
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
-
   return (
     <div
       className={cn(

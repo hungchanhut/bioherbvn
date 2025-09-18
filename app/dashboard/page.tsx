@@ -1,12 +1,15 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Sprout, Wifi, Activity, AlertTriangle, MapPin, Droplet, Leaf, Shovel, Bug } from "lucide-react"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import type { FarmProfile } from "@/lib/farm-profile"
 
 // Sample data for charts
 const temperatureData = [
@@ -83,10 +86,70 @@ const activeIssues = [
 ]
 
 export default function DashboardPage() {
+  const [profile, setProfile] = useState<FarmProfile | null>(null)
+
+  useEffect(() => {
+    let ignore = false
+    const load = async () => {
+      try {
+        const res = await fetch("/api/farm-profile", { cache: "no-store" })
+        if (!res.ok) return
+        const data = (await res.json()) as FarmProfile
+        if (!ignore) setProfile(data)
+      } catch (e) {
+        // ignore fetch errors for now
+      }
+    }
+    load()
+    return () => {
+      ignore = true
+    }
+  }, [])
+
   return (
     <div className="p-6">
       <div className="container mx-auto">
   <h1 className="text-4xl font-bold gradient-text mb-8">Bảng điều khiển BioHerb</h1>
+
+        {/* Farm Profile Summary */}
+        <Card className="glass-card glow-primary mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Leaf className="h-5 w-5 text-accent" />
+              Thông tin hồ sơ trang trại
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-muted-foreground">Tên HTX/Doanh nghiệp</label>
+                <Input value={profile?.name ?? "—"} readOnly className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Địa chỉ</label>
+                <Input value={profile?.address ?? "—"} readOnly className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Tổng diện tích (ha)</label>
+                <Input value={profile ? String(profile.totalAreaHa) : "—"} readOnly className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">Tình trạng giấy phép kinh doanh</label>
+                <div className="mt-1">
+                  {profile?.businessLicenseStatus === "Verified" ? (
+                    <Badge className="bg-emerald-500 text-emerald-950 border-transparent">Đã xác minh</Badge>
+                  ) : profile?.businessLicenseStatus === "Pending" ? (
+                    <Badge className="bg-yellow-400 text-black border-transparent">Đang chờ</Badge>
+                  ) : profile?.businessLicenseStatus === "Expired" ? (
+                    <Badge variant="destructive">Hết hạn</Badge>
+                  ) : (
+                    <Badge variant="outline">—</Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 2x2 Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
