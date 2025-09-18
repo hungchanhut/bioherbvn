@@ -13,7 +13,21 @@ import {
   SidebarMenuButton,
   SidebarInset,
 } from "@/components/ui/sidebar"
-import { Home, Leaf, Activity, Scissors as Sensors, Settings, ClipboardCheck, Package, Truck, BadgeCheck } from "lucide-react"
+import {
+  Home,
+  Leaf,
+  Activity,
+  Scissors as Sensors,
+  Users,
+  Box,
+  Landmark,
+  Clipboard,
+  Plug,
+  Wheat,
+  Boxes,
+  BadgeCheck,
+  History,
+} from "lucide-react"
 import Link from "next/link"
 
 const navigation = [
@@ -21,11 +35,15 @@ const navigation = [
   { name: "Vườn trồng", href: "/farm-plots", icon: Leaf },
   { name: "Giám sát cảm biến", href: "/sensor-monitoring", icon: Sensors },
   { name: "Nhật ký hoạt động", href: "/activity-logs", icon: Activity },
-  { name: "Lịch sử thanh tra", href: "/inspection-history", icon: ClipboardCheck },
-  { name: "Thu hoạch & Sau thu hoạch", href: "/harvest-post-harvest", icon: Package },
+  { name: "Lịch sử kiểm tra", href: "/inspection-history", icon: History },
+  { name: "Thu hoạch & sau thu hoạch", href: "/harvest-post-harvest", icon: Wheat },
   { name: "Trung tâm chứng nhận", href: "/certifications-hub", icon: BadgeCheck },
-  { name: "Đóng gói, Giao vận & Bán hàng", href: "/packaging-logistics-sales", icon: Truck },
-  { name: "Cài đặt", href: "/settings", icon: Settings },
+  { name: "Đóng gói, logistics & bán hàng", href: "/packaging-logistics-sales", icon: Boxes },
+  { name: "Thị trường & bán hàng", href: "/market-sales", icon: Landmark },
+  { name: "Sản phẩm & đóng gói", href: "/product-packaging", icon: Box },
+  { name: "Quản lý nhân sự", href: "/personnel-management", icon: Users },
+  { name: "Tích hợp", href: "/integrations", icon: Plug },
+  { name: "Báo cáo & chứng nhận", href: "/reports-certifications", icon: Clipboard },
 ]
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
