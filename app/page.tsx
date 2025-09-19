@@ -34,7 +34,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6">
         <div className="container mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 gradient-text">Tương lai nông nghiệp — hôm nay.</h1>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 overflow-visible gradient-text leading-[1.2] md:leading-[1.15] tracking-tight pt-1 pb-2">Quản lý vùng trồng thông minh.</h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed">
             Ứng dụng IoT và AI để canh tác dược liệu với độ chính xác, tuân thủ và minh bạch vượt trội.
           </p>

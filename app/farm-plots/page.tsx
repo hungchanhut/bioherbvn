@@ -21,11 +21,11 @@ const InteractiveMap = dynamic(() => import("@/components/map/interactive-map"),
 
 // Mock data for farm plots
 const farmPlots = [
-  { id: 1, name: "Lô A", herb: "Basil", area: "2.5 acres", soilType: "Loamy", plantDate: "2024-01-15" },
-  { id: 2, name: "Lô B", herb: "Rosemary", area: "1.8 acres", soilType: "Sandy", plantDate: "2024-02-01" },
-  { id: 3, name: "Lô C", herb: "Thyme", area: "3.2 acres", soilType: "Clay", plantDate: "2024-01-20" },
-  { id: 4, name: "Lô D", herb: "Oregano", area: "2.1 acres", soilType: "Loamy", plantDate: "2024-02-10" },
-  { id: 5, name: "Lô E", herb: "Mint", area: "1.5 acres", soilType: "Sandy", plantDate: "2024-01-25" },
+  { id: 1, name: "Lô A", herb: "Dây thìa canh lá to", area: "2.5 acres", soilType: "Loamy", plantDate: "2024-01-15" },
+  { id: 2, name: "Lô B", herb: "Dây thìa canh lá to", area: "1.8 acres", soilType: "Sandy", plantDate: "2024-02-01" },
+  { id: 3, name: "Lô C", herb: "Dây thìa canh lá to", area: "3.2 acres", soilType: "Clay", plantDate: "2024-01-20" },
+  { id: 4, name: "Lô D", herb: "Dây thìa canh lá to", area: "2.1 acres", soilType: "Loamy", plantDate: "2024-02-10" },
+  { id: 5, name: "Lô E", herb: "Dây thìa canh lá to", area: "1.5 acres", soilType: "Sandy", plantDate: "2024-01-25" },
 ]
 
 // Mock sensor data
@@ -141,18 +141,38 @@ export default function FarmPlotsPage() {
               </CardHeader>
               <CardContent className="flex-1">
                 <Tabs defaultValue="overview" className="h-full">
-                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
-                    <TabsTrigger value="overview">Tổng quan</TabsTrigger>
-                    <TabsTrigger value="sensors">Cảm biến</TabsTrigger>
-                    <TabsTrigger value="activity">Lịch sử hoạt động</TabsTrigger>
-                    <TabsTrigger value="certs">Chứng nhận</TabsTrigger>
-                    <TabsTrigger value="dna-land">DNA & Đất</TabsTrigger>
-                    <TabsTrigger value="land-seed-inputs">Đất, giống & đầu vào</TabsTrigger>
-                    <TabsTrigger value="harvest-post">Thu hoạch & sau thu hoạch</TabsTrigger>
-                    <TabsTrigger value="testing-compliance">Kiểm nghiệm & tuân thủ</TabsTrigger>
+                  <TabsList
+                    className="relative w-full overflow-x-auto overflow-y-hidden whitespace-nowrap flex items-center gap-2 mb-6 pr-2 rounded-md"
+                    onWheel={(e) => {
+                      if (e.deltaY !== 0) {
+                        e.preventDefault()
+                        e.currentTarget.scrollLeft += e.deltaY
+                      }
+                    }}
+                  >
+                    <TabsTrigger className="shrink-0" value="overview">Tổng quan</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="sensors">Cảm biến</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="activity">Lịch sử hoạt động</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="certs">Chứng nhận</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="dna-land">DNA & Đất</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="land-seed-inputs">Đất, giống & đầu vào</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="harvest-post">Thu hoạch & sau thu hoạch</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="testing-compliance">Kiểm nghiệm & tuân thủ</TabsTrigger>
+                    <TabsTrigger className="shrink-0" value="live_camera">Camera trực tiếp</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="space-y-6">
+                    {/* Main Surveillance Camera */}
+                    <div className="glass-card p-6 rounded-lg border border-white/10">
+                      <div className="mb-4 flex items-center justify-between">
+                        <h3 className="font-semibold flex items-center gap-2"><Camera className="w-5 h-5 text-primary" />Camera giám sát chính</h3>
+                        <Badge className="bg-emerald-400 text-emerald-950">Online</Badge>
+                      </div>
+                      <div className="aspect-video w-full rounded-md border border-white/10 bg-gradient-to-br from-black/40 to-white/5 flex items-center justify-center text-muted-foreground text-sm tracking-wide">
+                        Luồng video trực tiếp (placeholder)
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">Tích hợp RTSP/WebRTC sẽ hiển thị tại đây.</p>
+                    </div>
                     {/* Interactive Map */}
                     <div className="glass-card p-6 rounded-lg border border-white/10">
                       <div className="mb-3 flex items-center gap-2">
@@ -431,6 +451,29 @@ export default function FarmPlotsPage() {
 
                   {/* Testing & Compliance Tab */}
                   <TabsContent value="testing-compliance" className="space-y-6">
+                  {/* Live Camera Tab */}
+                  <TabsContent value="live_camera" className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Danh sách camera trực tiếp</h3>
+                      <Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2" />Thêm camera</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <Card key={i} className="glass-card overflow-hidden">
+                          <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-sm font-medium">Camera Vị trí {String(i + 1).padStart(2, '0')}</CardTitle>
+                            <Badge className="bg-emerald-400 text-emerald-950">Online</Badge>
+                          </CardHeader>
+                          <CardContent className="p-0">
+                            <div className="aspect-video w-full bg-black/60 flex items-center justify-center text-xs text-muted-foreground">
+                              Video feed placeholder
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Tương lai: hỗ trợ phát trực tiếp WebRTC, phân tích AI (phát hiện xâm nhập, tình trạng cây).</p>
+                  </TabsContent>
                     <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
                       <h3 className="font-semibold">Kiểm nghiệm & tuân thủ</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

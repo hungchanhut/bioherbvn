@@ -155,5 +155,8 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    /* Prevent diacritic clipping for Vietnamese by giving extra vertical space */
+    line-height: 1.2;
+    text-shadow: 0 0 transparent; /* Safari/WebKit rendering hint */
   }
 }
