@@ -27,7 +27,7 @@ L.Icon.Default.mergeOptions({
 // 10 hectares ~ 0.1 km^2. We'll create a tiny rectangle (roughly 316m x 316m) in lat/long.
 // Latitude degrees ~111km; Longitude degrees at this latitude ~ 111km * cos(lat).
 // We'll approximate offsets ~0.00285 degrees (~316m) for simplicity.
-const plotCenter: [number, number] = [21.6005, 105.6835]
+const plotCenter: [number, number] = [21.8799, 105.7425]
 const offset = 0.00285 / 2 // half-size each direction
 const plotPolygon: [number, number][] = [
   [plotCenter[0] + offset, plotCenter[1] - offset],

@@ -57,6 +57,15 @@ const healthAlerts = [
   { id: 2, name: "Leaf Blight", severity: "Medium" },
 ]
 
+// Demo live camera placeholders (YouTube video IDs)
+const demoCameras: Array<{ id: string; title: string; youtubeId: string; status?: string }> = [
+  { id: "north-gate", title: "Camera Cổng Bắc", youtubeId: "aqz-KE-bpKQ", status: "Online" },
+  { id: "field-1", title: "Camera Lô 1", youtubeId: "dQw4w9WgXcQ", status: "Online" },
+  { id: "drying-area", title: "Khu phơi sấy", youtubeId: "5qap5aO4i9A", status: "Online" },
+  { id: "processing", title: "Nhà sơ chế", youtubeId: "ktvTqknDobU", status: "Online" },
+  { id: "perimeter", title: "Chu vi trang trại", youtubeId: "21X5lGlDOfg", status: "Offline" },
+]
+
 // Mock 5-year land history
 const landHistory = [
   { year: 2025, crop: "Húng quế (Basil)", fertilizers: "Phân hữu cơ, NPK nhẹ" },
@@ -451,29 +460,6 @@ export default function FarmPlotsPage() {
 
                   {/* Testing & Compliance Tab */}
                   <TabsContent value="testing-compliance" className="space-y-6">
-                  {/* Live Camera Tab */}
-                  <TabsContent value="live_camera" className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">Danh sách camera trực tiếp</h3>
-                      <Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2" />Thêm camera</Button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <Card key={i} className="glass-card overflow-hidden">
-                          <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0">
-                            <CardTitle className="text-sm font-medium">Camera Vị trí {String(i + 1).padStart(2, '0')}</CardTitle>
-                            <Badge className="bg-emerald-400 text-emerald-950">Online</Badge>
-                          </CardHeader>
-                          <CardContent className="p-0">
-                            <div className="aspect-video w-full bg-black/60 flex items-center justify-center text-xs text-muted-foreground">
-                              Video feed placeholder
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Tương lai: hỗ trợ phát trực tiếp WebRTC, phân tích AI (phát hiện xâm nhập, tình trạng cây).</p>
-                  </TabsContent>
                     <div className="glass-card p-6 rounded-lg border border-white/10 space-y-4">
                       <h3 className="font-semibold">Kiểm nghiệm & tuân thủ</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,6 +477,48 @@ export default function FarmPlotsPage() {
                         </div>
                       </div>
                     </div>
+                  </TabsContent>
+
+                  {/* Live Camera Tab */}
+                  <TabsContent value="live_camera" className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Danh sách camera trực tiếp</h3>
+                      <Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2" />Thêm camera</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {demoCameras.map((cam) => (
+                        <Card key={cam.id} className="glass-card overflow-hidden">
+                          <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0">
+                            <CardTitle className="text-sm font-medium truncate max-w-[160px]" title={cam.title}>{cam.title}</CardTitle>
+                            {cam.status === 'Online' ? (
+                              <Badge className="bg-emerald-400 text-emerald-950">Online</Badge>
+                            ) : (
+                              <Badge variant="destructive">Offline</Badge>
+                            )}
+                          </CardHeader>
+                          <CardContent className="p-0">
+                            {cam.status === 'Online' ? (
+                              <div className="relative w-full aspect-video bg-black/60">
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${cam.youtubeId}?rel=0&controls=1`}
+                                  title={cam.title}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="absolute inset-0 h-full w-full"
+                                />
+                              </div>
+                            ) : (
+                              <div className="aspect-video w-full bg-black/60 flex items-center justify-center text-xs text-muted-foreground">
+                                Mất kết nối
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Demo: các camera phát placeholder từ YouTube. Bản chính sẽ dùng RTSP/WebRTC + phân tích AI (đếm người, phát hiện xâm nhập, trạng thái cây trồng...).
+                    </p>
                   </TabsContent>
 
                   <TabsContent value="sensors">
